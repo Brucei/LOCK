@@ -21,15 +21,15 @@
 //code    #      *      0       1      2       3        4        5        6         7        8        9
 //       1011  1010    0000   0001    0010   0011     0100     0101     0110      0111      1000     1001
 module decider(
-input reset_1,       //ÖÃÎ»ĞÅºÅ
-input [3:0] Code_1, //ÊäÈëµÄ1Î»°´¼ü
-input Valid_1,      //ÓĞĞ§ĞÅºÅ
-//input [15:0] Key ,   //ÓÃ»§ÊäÈë4Î»ÃÜÂë
+input reset_1,       //ç½®ä½ä¿¡å·
+input [3:0] Code_1, //è¾“å…¥çš„1ä½æŒ‰é”®
+input Valid_1,      //æœ‰æ•ˆä¿¡å·
+//input [15:0] Key ,   //ç”¨æˆ·è¾“å…¥4ä½å¯†ç 
 //input [15:0] Key_1,
 //input  [3:0] Key,
 input clk,
-                                    //¶ÔÓ¦´æ´¢Æ÷µÄµØÖ·
-//input [2:0] RAM_1_addr,            //¶ÔÓ¦´æ´¢Æ÷µÄµØÖ·
+                                    //å¯¹åº”å­˜å‚¨å™¨çš„åœ°å€
+//input [2:0] RAM_1_addr,            //å¯¹åº”å­˜å‚¨å™¨çš„åœ°å€
 output reg  OPEN,
 output reg LOCK,
 output reg SAVE_LIGHT
@@ -74,15 +74,15 @@ else
 RAM_addr=0;
 end
 
-assign  RAM_DATA_1=RAM_1[RAM_addr_1];        //´æ´¢8Î»´æ´¢ÃÜÂë
-assign  RAM_DATA=RAM[RAM_addr];          //´æ´¢ÊäÈë
+assign  RAM_DATA_1=RAM_1[RAM_addr_1];        //å­˜å‚¨8ä½å­˜å‚¨å¯†ç 
+assign  RAM_DATA=RAM[RAM_addr];          //å­˜å‚¨è¾“å…¥
    always@(posedge clk )            //###############
    begin
-   if(reset_1)                                   //½øÈë¸´Î»£¬¿ÉÒÔÊäÈëĞÂÃÜÂë
-   state_1<=B_2;                                 //½øÈë´æ´¢Ä£Ê½
+   if(reset_1)                                   //è¿›å…¥å¤ä½ï¼Œå¯ä»¥è¾“å…¥æ–°å¯†ç 
+   state_1<=B_2;                                 //è¿›å…¥å­˜å‚¨æ¨¡å¼
    else 
    state_1<=next_state_1;      
-   end                       //·ñÔò½øÈëÏÂÒ»×´Ì¬
+   end                       //å¦åˆ™è¿›å…¥ä¸‹ä¸€çŠ¶æ€
 
 always@(state_1,Valid_1,Code_1)
     begin
@@ -90,25 +90,25 @@ always@(state_1,Valid_1,Code_1)
     SAVE_LIGHT=1'b0;
     LOCK=1'b0;
                 case(state_1)
-B_0:                                                        //¿ÕÏĞ×´Ì¬£¬ÅĞ¶ÏÊÇ·ñ°´ÏÂÃÜÂëºÍ"#"¼ü£¬°´ÏÂÔòÌø×ªÖÁ¿ªÆô×´Ì¬
+B_0:                                                        //ç©ºé—²çŠ¶æ€ï¼Œåˆ¤æ–­æ˜¯å¦æŒ‰ä¸‹å¯†ç å’Œ"#"é”®ï¼ŒæŒ‰ä¸‹åˆ™è·³è½¬è‡³å¼€å¯çŠ¶æ€
                     if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1011))
                         begin
                             next_state_1=B_1;
                             OPEN=1;
                         end
-                    else if(RAM_DATA[0]==4'b1011)                  //Ò»Ö±°´ÏÂ¡°#¼ü¡±£¬ÔòÒ»Ö±´ò¿ª
+                    else if(RAM_DATA[0]==4'b1011)                  //ä¸€ç›´æŒ‰ä¸‹â€œ#é”®â€ï¼Œåˆ™ä¸€ç›´æ‰“å¼€
                         begin
                         next_state_1=B_1;                  
                         OPEN=1;
                         end
                         else if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1010))
                         begin
-                        next_state_1=B_2;                 //½øÈë´æ´¢×´Ì¬
+                        next_state_1=B_2;                 //è¿›å…¥å­˜å‚¨çŠ¶æ€
                         SAVE_LIGHT=1;
                         end
                         else 
                         begin
-                        next_state_1=B_3;                 //½øÈëËø¶¨×´Ì¬
+                        next_state_1=B_3;                 //è¿›å…¥é”å®šçŠ¶æ€
                         LOCK=1;
                         end
                         
@@ -124,13 +124,13 @@ begin
         else   if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1010))                       
             begin
             
-                        next_state_1=B_2;                 //½øÈë´æ´¢×´Ì¬
+                        next_state_1=B_2;                 //è¿›å…¥å­˜å‚¨çŠ¶æ€
                         SAVE_LIGHT=1;
              
             end
             else
             begin
-                        next_state_1=B_3;                 //½øÈëËø¶¨×´Ì¬
+                        next_state_1=B_3;                 //è¿›å…¥é”å®šçŠ¶æ€
                         LOCK=1;
                         end
 end
@@ -146,11 +146,11 @@ begin
 for(i=0;i<5;i=i+1)
 RAM_1[i]=Code_1;
 if({RAM_1[3],RAM_1[2],RAM_1[1],RAM_1[0]}&&{RAM[3],RAM[2],RAM[1],RAM[0]})
-if(RAM_1[4]==4'b1010)                                              //ÊäÈë³õÊ¼ÃÜÂëºÍ"*"¼ü½øÈë´æ´¢×´Ì¬
+if(RAM_1[4]==4'b1010)                                              //è¾“å…¥åˆå§‹å¯†ç å’Œ"*"é”®è¿›å…¥å­˜å‚¨çŠ¶æ€
 begin
 SAVE_LIGHT=1;
 /*
-for(i=0;i<10;i=i+1)                                                  //½«ÃÜÂëÖØÖÃ´æÈëRAM¼Ä´æÆ÷
+for(i=0;i<10;i=i+1)                                                  //å°†å¯†ç é‡ç½®å­˜å…¥RAMå¯„å­˜å™¨
 RAM[i]=Code_1;
 */
 if({RAM[3],RAM[2],RAM[1],RAM[0]}=={RAM[8],RAM[7],RAM[6],RAM[5]})
@@ -174,7 +174,7 @@ end
  if(reset_1==0)
  if(Valid_1)
  begin
- begin                                                 //×Ó×´Ì¬»ú£¬ÒÔÊ±ÖÓĞÅºÅÉÏÉıÑØÎ»²ÉÑùCode_1
+ begin                                                 //å­çŠ¶æ€æœºï¼Œä»¥æ—¶é’Ÿä¿¡å·ä¸Šå‡æ²¿ä½é‡‡æ ·Code_1
  SAVE_LIGHT<=0;
         case(sub_state_1)
  
@@ -188,10 +188,10 @@ begin
 for(i=0;i<5;i=i+1)
 RAM_1[i]<=Code_1;
 if({RAM_1[3],RAM_1[2],RAM_1[1],RAM_1[0]}=={RAM[3],RAM[2],RAM[1],RAM[0]})
-if(RAM_1[4]==4'b1010)                                              //ÊäÈë³õÊ¼ÃÜÂëºÍ"*"¼ü½øÈë´æ´¢×´Ì¬
+if(RAM_1[4]==4'b1010)                                              //è¾“å…¥åˆå§‹å¯†ç å’Œ"*"é”®è¿›å…¥å­˜å‚¨çŠ¶æ€
 begin
 SAVE_LIGHT<=1;
-for(i=0;i<10;i=i+1)                                                  //½«ÃÜÂëÖØÖÃ´æÈëRAM¼Ä´æÆ÷
+for(i=0;i<10;i=i+1)                                                  //å°†å¯†ç é‡ç½®å­˜å…¥RAMå¯„å­˜å™¨
 RAM[i]<=Code_1;
 if({RAM[3],RAM[2],RAM[1],RAM[0]}=={RAM[8],RAM[7],RAM[6],RAM[5]})
 begin
