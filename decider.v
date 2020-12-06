@@ -32,28 +32,32 @@ input clk,
 //input [2:0] RAM_1_addr,            //对应存储器的地址
 output reg  OPEN,
 output reg LOCK,
-output reg SAVE_LIGHT
+output reg SAVE_LIGHT,
  //output  reg [3:0] count 
+  output   wire [3:0] RAM_DATA_1,       
+  output   wire [3:0]  RAM_DATA,
+  output   wire  [2:0] count_1
     );  
     integer i;    
     reg [2:0] RAM_addr_1;
     reg [3:0] RAM_addr;
-    wire [3:0] RAM_DATA_1;         
-    wire [3:0]  RAM_DATA;                                                   
+    reg [2:0] count;
+ // output   wire [3:0] RAM_DATA_1;         
+ // output   wire [3:0]  RAM_DATA;                                              
     reg [2:0] state_1,next_state_1;
  reg [3:0] RAM [3:0];
   reg [3:0] RAM_1 [2:0];
     initial $readmemb("RAM_DATA.txt",RAM_1,0,7);
-    parameter B_0=4'b0001;   //IDLE
+    parameter B_0=4'b0001;   //LOCK
     parameter B_1=4'b0010;   //OPEN THE LOCK
     parameter B_2=4'b0100;   //SAVE
-    parameter B_3=4'b1000;   //LOCK
+ //   parameter B_3=4'b1000;   //LOCK
 
  always @(posedge clk)
  begin
  if(reset_1==0)
  RAM_addr_1=0;
- else if(RAM_addr_1<=7)
+ else if(RAM_addr_1<=7)              //存储输入RAM地址
  begin
 RAM_addr_1=RAM_addr_1+1;
 end
@@ -61,7 +65,7 @@ else
 RAM_addr_1=0;
 end
 
- always @(posedge clk)
+ always @(posedge clk)     //存储密码RAM地址
  begin
  if(reset_1==0)
  RAM_addr_1=0;
@@ -73,7 +77,7 @@ end
 else 
 RAM_addr=0;
 end
-
+ assign count_1=count;
 assign  RAM_DATA_1=RAM_1[RAM_addr_1];        //存储8位存储密码
 assign  RAM_DATA=RAM[RAM_addr];          //存储输入
    always@(posedge clk )            //###############
@@ -88,127 +92,106 @@ always@(state_1,Valid_1,Code_1)
     begin
     OPEN=1'b0;
     SAVE_LIGHT=1'b0;
-    LOCK=1'b0;
+    LOCK=1'b1;
                 case(state_1)
 B_0:                                                        //空闲状态，判断是否按下密码和"#"键，按下则跳转至开启状态
+
                     if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1011))
                         begin
                             next_state_1=B_1;
-                            OPEN=1;
+                            OPEN=1'b1;
+                            SAVE_LIGHT=1'b0;
+                            LOCK=1'b0;
                         end
                     else if(RAM_DATA[0]==4'b1011)                  //一直按下“#键”，则一直打开
                         begin
                         next_state_1=B_1;                  
-                        OPEN=1;
+                        OPEN=1'b1;
+                        SAVE_LIGHT=1'b0;
+                        LOCK=1'b0;
                         end
                         else if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1010))
                         begin
                         next_state_1=B_2;                 //进入存储状态
-                        SAVE_LIGHT=1;
+                        SAVE_LIGHT=1'b1;
+                        OPEN=1'b0;
+                        LOCK=1'b1;
                         end
                         else 
                         begin
-                        next_state_1=B_3;                 //进入锁定状态
-                        LOCK=1;
+                        next_state_1=B_0;                 //进入锁定状态
+                        LOCK=1'b1;
+                         OPEN=1'b0;
+                          SAVE_LIGHT=1'b0;
                         end
                         
-B_1: 
-if((reset_1==0)&(Valid_1==1))
+B_1:                                                               //打开状态
+if((reset_1==0)&&(Valid_1==1))
 begin
-             OPEN=1;
-             if(RAM_DATA[0]==4'b1011)
+             OPEN=1'b1;
+             LOCK=1'b0;
+             SAVE_LIGHT=1'b0;
+             if(RAM_DATA[0]==4'b1011)                            //一直按下”#“保持打开
              begin
              next_state_1=B_1;
              OPEN=1'b1;
+             LOCK=1'b0;
+             SAVE_LIGHT=1'b0;
             end
-        else   if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1010))                       
+        else   
+        /*
+        if((RAM_DATA[1]==RAM_DATA_1[1])&&(RAM_DATA[2]==RAM_DATA_1[2])&&(RAM_DATA[3]==RAM_DATA_1[3])&&(RAM_DATA[4]==RAM_DATA_1[4])&&(RAM_DATA[0]==4'b1010))       //                
             begin
             
                         next_state_1=B_2;                 //进入存储状态
-                        SAVE_LIGHT=1;
+                        SAVE_LIGHT=1'b1;
+                        OPEN=1'b0;
+                        LOCK=1'b1;
              
             end
-            else
+            */
+    
             begin
-                        next_state_1=B_3;                 //进入锁定状态
-                        LOCK=1;
+                        next_state_1=B_0;                 //进入锁定状态
+                        LOCK=1'b1;
+                        SAVE_LIGHT=1'b0;
+                        OPEN=1'b0;
                         end
 end
-B_2:
-begin
-SAVE_LIGHT=1;
-for(i=0;i<4;i=i+1)
-RAM[i]=Code_1;
-if(RAM[
-if((Valid_1==1)||(reset_1==1))
-begin
-
-for(i=0;i<5;i=i+1)
-RAM_1[i]=Code_1;
-if({RAM_1[3],RAM_1[2],RAM_1[1],RAM_1[0]}&&{RAM[3],RAM[2],RAM[1],RAM[0]})
-if(RAM_1[4]==4'b1010)                                              //输入初始密码和"*"键进入存储状态
-begin
-SAVE_LIGHT=1;
-/*
-for(i=0;i<10;i=i+1)                                                  //将密码重置存入RAM寄存器
-RAM[i]=Code_1;
-*/
-if({RAM[3],RAM[2],RAM[1],RAM[0]}=={RAM[8],RAM[7],RAM[6],RAM[5]})
-begin
-if((RAM[4]==4'b1011)&&(RAM[9]==4'b1011))
-SAVE_LIGHT=0;
-end
-/*
-else
-begin
-for(i=0;i<8;i=i+1)
-RAM[i]=Code_1;
-end
-*/
-end
-end
- endcase
- end
- /*
- always@(posedge clk or negedge reset_1)
- if(reset_1==0)
- if(Valid_1)
- begin
- begin                                                 //子状态机，以时钟信号上升沿位采样Code_1
- SAVE_LIGHT<=0;
-        case(sub_state_1)
- 
-B_2:
+B_2:                      //存储状态
+if(reset_1==1)               //进入复位，输入4位密码
 begin
 for(i=0;i<4;i=i+1)
-RAM[i]<=Code_1;
+RAM[i]=Code_1;
 end
 else
+begin                          //进入存储
+count=0;
+SAVE_LIGHT=1'b1;
+ LOCK=1'b1;
+ OPEN=1'b0;
+for(i=0;i<10;i=i+1)                    //输入两遍密码
 begin
-for(i=0;i<5;i=i+1)
-RAM_1[i]<=Code_1;
-if({RAM_1[3],RAM_1[2],RAM_1[1],RAM_1[0]}=={RAM[3],RAM[2],RAM[1],RAM[0]})
-if(RAM_1[4]==4'b1010)                                              //输入初始密码和"*"键进入存储状态
-begin
-SAVE_LIGHT<=1;
-for(i=0;i<10;i=i+1)                                                  //将密码重置存入RAM寄存器
-RAM[i]<=Code_1;
-if({RAM[3],RAM[2],RAM[1],RAM[0]}=={RAM[8],RAM[7],RAM[6],RAM[5]})
-begin
-if((RAM[4]==4'b1011)&&(RAM[9]==4'b1011))
-SAVE_LIGHT<=0;
+RAM[i]=Code_1;
 end
-else
+while (!((RAM[1]&RAM[6])&&(RAM[2]&RAM[7])&&(RAM[3]&RAM[8]))&&(RAM[4]&RAM[9])&&(RAM[0]&4'b1011)&&(RAM[4]&4'b1011))   //若两遍输入不同，重新输入。每次输入都以"#"结束
 begin
+for(i=0;i<10;i=i+1)
+begin
+RAM[i]=Code_1;
+count=count+1;
+if(count>7)                                 //count计算错误次数
+break;
+end
+end
 
-for(i=0;i<8;i=i+1)
-RAM[i]<=Code_1;
+SAVE_LIGHT=1'b0;   //修改完密码，存储指示灯灭
+ LOCK=1'b1;
+ OPEN=1'b0;
+ next_state_1=B_0;  //修改完密码进入锁定状态
 end
-end
-end
-default:next_sub_state_1<=B_2;
+default: next_state_1=B_0;   //默认进入锁定状态
 endcase
+
 end
-end
-*/
 endmodule
