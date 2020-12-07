@@ -24,81 +24,52 @@ module decider(
 input reset_1,       //置位信号
 input [3:0] Code_1, //输入�?1位按�?
 input Valid_1,      //有效信号
-//input [15:0] Key ,   //用户输入4位密�?
-//input [15:0] Key_1,
-//input  [3:0] Key,
+input write_en,
+input read_en,
+input  [3:0] RAM_addr,
 input clk,
 input set,
-                                    //对应存储器的地址
-//input [2:0] RAM_1_addr,            //对应存储器的地址
 output reg OPEN,
 output reg  LOCK,
-output reg SAVE_LIGHT,
-  output   reg  [2:0] count_1,
-  output reg [3:0] RAM_1_DATA ,
-  output reg [3:0] RAM_DATA
+output reg SAVE_LIGHT
     );  
-    integer i;    
-    reg [3:0] RAM_addr_1;
-    reg [9:0] RAM_addr;
- // output   wire [3:0] RAM_DATA_1;         
- // output   wire [3:0]  RAM_DATA;                                              
+    integer i;                                               
     reg [2:0] state_1,next_state_1;
- reg [3:0] RAM [9:0];
+ reg [3:0] RAM [15:0];
   reg [3:0] RAM_1 [3:0];
-  //  initial $readmemb("RAM_DATA.txt",RAM_1,0,3);
+  reg [3:0] data;
+reg [2:0] count_1;
     parameter B_0=4'b0001;   //LOCK
     parameter B_1=4'b0010;   //OPEN THE LOCK
     parameter B_2=4'b0100;   //SAVE
- //   parameter B_3=4'b1000;   //LOCK
 
- initial
+
+initial $readmemh("RAM_DATA.tzt",RAM_1,3,0);
+
+ always @(posedge clk or posedge reset_1)     //�洢����RAM��ַ
  begin
- RAM_1[1]=4'b1001;
-  RAM_1[2]=4'b1100;
-   RAM_1[4]=4'b0001;
-    RAM_1[8]=4'b0000;
+ if(reset_1==1)
+ begin
+ for(i=0;i<16;i=i+1)
+ RAM[i]<=4'b0000;
  end
-
- always @(posedge clk)     //�洢����RAM��ַ
+ else if(write_en)
  begin
- if(reset_1==1)
- RAM_addr_1=10'b0000000001;
- else if(RAM_addr<=512)
- begin
-RAM_addr=RAM_addr<<1;
-RAM[RAM_addr]=Code_1;
-RAM_DATA=RAM[RAM_addr];
+RAM[RAM_addr]<=Code_1;
 end
-else 
-RAM_addr=10'b00000001;
+else if(read_en)
+begin
+data<=RAM[RAM_addr];
 end
- always @(posedge clk)     //�洢����RAM��ַ
- begin
- if(reset_1==1)
- RAM_addr_1=4'b0001;
- else if(RAM_addr_1<=8)
- begin
-RAM_addr_1=RAM_addr_1<<1;
-RAM_1[RAM_addr_1]=4'b0001;
-
+else
+begin
+data<=4'bz;
 end
-else 
-RAM_addr=4'b0001;
 end
-
-/*
-   always@(posedge clk )            //###############
-   begin
-   if(reset_1)                                   //进入复位，可以输入新密码
-   state_1<=B_2;                                 //进入存储模式
-   else 
-   state_1<=next_state_1;      
-   end                       //否则进入下一状�??
-*/
-always@(posedge clk)
+assign Code_1=read_en?data:4'bz;
+always@(Code_1,reset_1,state_1,Valid_1,set)
     begin
-    if(reset_1==1)
+    if(reset_1==0)
     begin
     OPEN=1'b0;
     SAVE_LIGHT=1'b0;
