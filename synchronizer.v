@@ -1,15 +1,16 @@
 module Synchronizer(
-    output reg          S_Row,
     input       [3:0]   Row,
     input               clock,
-    input               reset
+    input               reset,
+    
+    output reg          S_Row
 );
 
 reg A_Row;
 
-always @(negedge clock,posedge reset)
+always @(posedge clock,negedge reset)
 begin
-    if(reset==1'b1) begin 
+    if(!reset) begin 
         A_Row<=0;
         S_Row<=0;
     end
