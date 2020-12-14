@@ -6,9 +6,10 @@
     
     output reg  [3:0]   Code,
     output reg  [2:0]   Col,
-    output              Valid
+    output reg          Valid
 );
-reg Valid_1;
+reg Valid_1,Valid_2;
+reg Code_OK;
 reg[4:0] state,next_state;
 parameter S_0=5'b00001;
 parameter S_1=5'b00010;
@@ -16,16 +17,17 @@ parameter S_2=5'b00100;
 parameter S_3=5'b01000;
 parameter S_4=5'b10000;
 
-always@ (posedge clock)
-begin
-Valid_1<=((state==S_1)||(state==S_2)||(state==S_3))&&Row;
+always @(posedge clock or negedge reset) begin
+    if(!reset)
+        Valid <= 0;
+    else
+        Valid <= ((next_state==S_1)||(next_state==S_2)||(next_state==S_3))&&S_Row;
 end
-
-assign Valid=Valid_1;
 
 always @(posedge clock or negedge reset) begin
     if(!reset)
-        Code = 0;
+        Code=4'bxxxx;
+    //else if(Code_OK) begin
     else begin
         case({Row,Col})
             7'b0001_001: Code=1;    //1
@@ -40,7 +42,7 @@ always @(posedge clock or negedge reset) begin
             7'b1000_001: Code=10;   //#
             7'b1000_010: Code=0;    //0
             7'b1000_100: Code=11;   //*
-            default:     Code=0;
+            default:Code=4'bxxxx;
         endcase
     end
 end
@@ -52,16 +54,39 @@ always @(posedge clock,negedge reset) begin
         state<=next_state;
 end
 
-always@(*) begin 
-    next_state=S_0;
-    case(state)
-        S_0:begin Col=3'b111; if(S_Row==1) next_state=S_1;else next_state=S_0;end
-        S_1:begin Col=3'b001; if(Row) next_state=S_4;else next_state=S_2;end
-        S_2:begin Col=3'b010; if(Row) next_state=S_4;else next_state=S_3;end
-        S_3:begin Col=3'b100; if(Row) next_state=S_4;else next_state=S_0;end
-        S_4:begin Col=3'b111; if(S_Row==0) next_state=S_0;else next_state=S_4;end
-        default:next_state=S_0;
-    endcase
+always@(negedge clock or negedge reset) begin 
+    if(!reset)
+        Col<=3'b000;
+    else begin
+        case(state)
+            S_0:begin 
+                Code_OK = 0;
+                if(S_Row) begin next_state<=S_1; Col<=3'b001; end
+                else begin next_state<=S_0; Col<=3'b111; end 
+            end
+            S_1:begin  
+                Code_OK = 0;
+                if(S_Row) begin next_state=S_4; Col<=3'b111; end
+                else begin next_state=S_2; Col<=3'b010; end
+            end
+            S_2:begin  
+                Code_OK = 0;
+                if(S_Row) begin next_state=S_4; Col<=3'b111; end
+                else begin next_state=S_3; Col<=3'b100; end
+            end
+            S_3:begin 
+                Code_OK = 0;
+                if(S_Row) begin next_state=S_4; Col<=3'b111; end
+                else begin next_state=S_0; Col<=3'b111; end 
+            end
+            S_4:begin 
+                Code_OK = 1;
+                if(!S_Row) begin next_state=S_0; Col<=3'b111; end
+                else begin next_state=S_4; Col<=3'b111; end
+            end
+            default:next_state=S_0;
+        endcase
+    end
 end
 
 endmodule

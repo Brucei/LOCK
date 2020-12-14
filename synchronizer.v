@@ -3,21 +3,8 @@ module Synchronizer(
     input               clock,
     input               reset,
     
-    output reg          S_Row
+    output              S_Row
 );
 
-reg A_Row;
-
-always @(posedge clock,negedge reset)
-begin
-    if(!reset) begin 
-        A_Row<=0;
-        S_Row<=0;
-    end
-    else begin
-        A_Row<=(Row[0]||Row[1]||Row[2]||Row[3]);
-        S_Row<=A_Row;
-    end
-end
-
+assign S_Row = (Row[0]||Row[1]||Row[2]||Row[3]);
 endmodule
