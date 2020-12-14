@@ -21,17 +21,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module test();
+module test_3();
 
 reg clock,reset;
 reg [11:0] Key;
 reg set_1;
 
-integer j,k;
 reg [39:0] Pressed;
-wire [2:0] Col;
-wire [3:0] Row;
-wire [3:0] Code;
 
 wire OPEN_1;
 wire SAVE_LIGHT_1;
@@ -56,19 +52,19 @@ parameter [39:0] Key_jing="Key_*";
 
 always@(*) begin
     case(Key)
-    12'h000: Pressed=None;
-    12'h001: Pressed=Key_0;
-    12'h002: Pressed=Key_1;
-    12'h004: Pressed=Key_2;
-    12'h008: Pressed=Key_3;
-    12'h010: Pressed=Key_4;
-    12'h020: Pressed=Key_5;
-    12'h040: Pressed=Key_6;
-    12'h080: Pressed=Key_7;
-    12'h100: Pressed=Key_8;
-    12'h200: Pressed=Key_9;
-    12'h400: Pressed=Key_xing;
-    12'h800: Pressed=Key_jing;
+    12'b0000_0000_0000: Pressed=None;
+    12'b0000_0000_0001: Pressed=Key_1;
+    12'b0000_0000_0010: Pressed=Key_2;
+    12'b0000_0000_0100: Pressed=Key_3;
+    12'b0000_0000_1000: Pressed=Key_4;
+    12'b0000_0001_0000: Pressed=Key_5;
+    12'b0000_0010_0000: Pressed=Key_6;
+    12'b0000_0100_0000: Pressed=Key_7;
+    12'b0000_1000_0000: Pressed=Key_8;
+    12'b0001_0000_0000: Pressed=Key_9;
+    12'b0010_0000_0000: Pressed=Key_jing;
+    12'b0100_0000_0000: Pressed=Key_0;
+    12'b1000_0000_0000: Pressed=Key_xing;
     default: Pressed=None;
     endcase
 end
@@ -83,24 +79,23 @@ always #5 clock=~clock;
 initial begin
     reset=1;
     set_1=0;
-
+    Key=12'b0000_0000_0000;//None
     #100 reset=~reset;//0
     #50 reset=~reset;//1
-    #30 set_1=~set_1;
-    #40 set_1=~set_1;
-    #40 set_1=~set_1;
-    #40 set_1=~set_1;
+	#100 Key = 12'b0000_0000_0010;//2
+	#100 Key = 0;
+	#100 Key = 12'b0000_0000_1000; //4
+    #100 Key = 0;
+    #100 Key = 12'b0000_0000_0100;//3
+    #100 Key = 0;
+    #100 Key = 12'b0000_0000_0010;//2
+	#100 Key = 0;
+	#100 Key = 12'b0010_0000_0000;//#
+	#10000 Key = 0;
+	#100
+	$stop;
 end
 
-initial begin 
-    for(k=0;k<=1;k=k+1) begin
-        Key=0; #20        
-        for(j=0;j<12;j=j+1) begin 
-            Key=0;
-            #20 Key[j]=1;
-            #60 Key=0;
-        end
-    end
-end
+
 
 endmodule

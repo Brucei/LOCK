@@ -8,7 +8,7 @@
     output reg  [2:0]   Col,
     output              Valid
 );
-
+reg Valid_1;
 reg[4:0] state,next_state;
 parameter S_0=5'b00001;
 parameter S_1=5'b00010;
@@ -16,7 +16,12 @@ parameter S_2=5'b00100;
 parameter S_3=5'b01000;
 parameter S_4=5'b10000;
 
-assign Valid=((state==S_1)||(state==S_2)||(state==S_3))&&Row;
+always@ (posedge clock)
+begin
+Valid_1<=((state==S_1)||(state==S_2)||(state==S_3))&&Row;
+end
+
+assign Valid=Valid_1;
 
 always @(posedge clock or negedge reset) begin
     if(!reset)

@@ -63,7 +63,7 @@ always @(posedge clk or negedge reset_1) begin
 end
 
 always@(posedge Valid_1) begin  //change state at each up-rising of Valid_1
-	next_state_2=5'bxxxxx;
+	next_state_2=5'b00000;
    
     case(state_2)
         WAIT_KEY1:begin if(Valid_1) next_state_2=WAIT_KEY2;end
