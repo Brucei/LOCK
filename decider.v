@@ -212,6 +212,7 @@ always@(posedge clk or negedge reset_1) begin
 	        LOCK<=1'b0;
 	        SET<=1'b0;
 	        CHANGE<=1'b0;
+	        count_Wrong <= 4'b0000;
 	        data_1<={RAM[4],RAM[3],RAM[2],RAM[1]};
         end
 
