@@ -35,6 +35,7 @@ wire LOCK_1 ;
 wire CHANGE;
 wire SET;
 wire [15:0] data;
+wire [3:0] count_Wrong_1;
 
 parameter [39:0] None="None";
 parameter [39:0] Key_0="Key_0";
@@ -70,7 +71,7 @@ always@(*) begin
 end
 
 top_1 top(.reset(reset),.clock(clock),.Key(Key),.set_1(set_1),
-            .OPEN_1(OPEN_1),.SAVE_LIGHT_1(SAVE_LIGHT_1),.LOCK_1(LOCK_1),.CHANGE(CHANGE),.SET(SET),.data(data));
+            .OPEN_1(OPEN_1),.SAVE_LIGHT_1(SAVE_LIGHT_1),.LOCK_1(LOCK_1),.CHANGE(CHANGE),.SET(SET),.data(data),.count_Wrong_1(count_Wrong_1));
 
 
 initial clock=0;

@@ -9,7 +9,8 @@ module top_1(
     output           LOCK_1,
     output           CHANGE,
     output           SET,
-    output   [15:0]  data
+    output   [15:0]  data,
+    output   [3:0]   count_Wrong_1
 );
 
 wire [2:0] Col;
@@ -29,5 +30,5 @@ keypad1         M1(.Row(Row),.S_Row(S_Row),.clock(clock),.reset(reset),.Code(Cod
 
 //main logic
 decider         M4(.reset_1(reset),.clk(clock),.Code_1(Code),.Valid_1(Valid),.set(set_1),.S_Row(S_Row),
-                    .OPEN(OPEN_1),.LOCK(LOCK_1),.SAVE_LIGHT(SAVE_LIGHT_1),.CHANGE(CHANGE),.SET(SET),.data_1(data));
+                    .OPEN(OPEN_1),.LOCK(LOCK_1),.SAVE_LIGHT(SAVE_LIGHT_1),.CHANGE(CHANGE),.SET(SET),.data_1(data),.count_Wrong(count_Wrong_1));
 endmodule

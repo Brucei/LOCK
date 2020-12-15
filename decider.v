@@ -32,7 +32,8 @@ module decider(
     output reg SAVE_LIGHT,
     output reg SET,
     output reg CHANGE,
-    output reg [15:0] data_1        //4key x 4bit
+    output reg [15:0] data_1,        //4key x 4bit
+    output reg [3:0] count_Wrong
 );
                                            
 reg [4:0] state_1;
@@ -49,7 +50,8 @@ parameter B_1=5'b00010;   //OPEN
 parameter B_2=5'b00100;   //SAVE
 parameter B_3=5'b01000;   //SET
 parameter B_4=5'b10000;   //CHANGE
-parameter B_5=5'b00011;   
+parameter B_5=5'b00011;  
+parameter B_6=5'b00111;   
 
 parameter WAIT_KEY1=5'b00001;   //KEY1
 parameter WAIT_KEY2=5'b00010;   //KEY2
@@ -119,7 +121,10 @@ always@(*) begin
 	    else if((RAM[1]==RAM_1[0])&&(RAM[2]==RAM_1[1])&&
 	            (RAM[3]==RAM_1[2])&&(RAM[4]==RAM_1[3])&&
 	            (RAM[0]==4'b1011)&& WAIT_Done)   //input the correct code and end with "*" ,jump into SAVE state
-	        next_state_1=B_2;                           
+	        next_state_1=B_2;   
+	    else if(((RAM[1]!=RAM_1[0])||(RAM[2]!=RAM_1[1])||
+			     (RAM[3]!=RAM_1[2])||(RAM[4]!=RAM_1[3]))&& WAIT_Done)
+			next_state_1=B_6;                   //if input wrong password
 	    else 
 	        next_state_1=B_0;                   //jump into LOCK state
 	    end  
@@ -143,8 +148,8 @@ always@(*) begin
 	    end
 
 	    B_3: begin  //SET state
-	    if((RAM[0]==4'b1010)&&(!set)&&WAIT_Done)   //first input password end with '#'
-	        next_state_1=B_4;
+	    if(!set)   
+	        next_state_1=B_2;
 	    else
 	        next_state_1=B_3;
 	    end
@@ -156,12 +161,20 @@ always@(*) begin
 	            (RAM[3]==RAM[8])&&(RAM[4]==RAM[9])&&    //if second input password same as first
 	            (RAM[0]==4'b1010)&&WAIT_Done)
 	        next_state_1=B_5;
+        else if(((RAM[1]!=RAM[6])||(RAM[2]!=RAM[7])||
+        		 (RAM[3]!=RAM[8])||(RAM[4]!=RAM[9]))&&    //if second input password not same as first
+            	(RAM[0]==4'b1010)&&WAIT_Done)
+        	next_state_1=B_2;
 	    else
 	        next_state_1=B_4;
 	    end
 
 	    B_5: begin
 	        next_state_1=B_0;
+	    end
+
+	    B_6: begin
+	    	next_state_1=B_0;
 	    end
 	    endcase
     end
@@ -175,6 +188,7 @@ always@(posedge clk or negedge reset_1) begin
         SET<=1'b0;
         CHANGE<=1'b0;
         data_1 <= 16'h0000;
+        count_Wrong <= 4'b0000;
         for(i=6;i<10;i=i+1) RAM[i] <= 0;
         RAM_1[0] = 4'b0010;     //2
         RAM_1[1] = 4'b0100;     //4
@@ -218,14 +232,12 @@ always@(posedge clk or negedge reset_1) begin
 	        LOCK<=1'b1;
 	        SET<=1'b1;
 	        CHANGE<=1'b0;
-	        RAM[6]<=RAM[1];RAM[7]<=RAM[2];
-	        RAM[8]<=RAM[3];RAM[9]<=RAM[4];
-	        data_1<={RAM[4],RAM[3],RAM[2],RAM[1]};
+	        RAM[0]=4'bxxxx;
         end
 
         B_4: begin
 	        OPEN<=1'b0;
-	        SAVE_LIGHT<=1'b0;
+	        SAVE_LIGHT<=1'b1;
 	        LOCK<=1'b1;
 	        SET<=1'b0;
 	        CHANGE<=1'b1;
@@ -235,6 +247,10 @@ always@(posedge clk or negedge reset_1) begin
         B_5: begin
         	RAM_1[0]<= RAM[6];RAM_1[1]<= RAM[7];
 	        RAM_1[2]<= RAM[8];RAM_1[3]<= RAM[9];        
+        end
+
+        B_6: begin
+        	count_Wrong = count_Wrong + 1;
         end
         endcase
     end
