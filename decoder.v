@@ -1,51 +1,22 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2020/12/17 21:58:14
-// Design Name: 
-// Module Name: decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
-module decoder(
-input [15:0] data,
-input en,
-output reg [6:0] decoder_out
-
-    );
-    reg [1:0] sel;
-    always@(data or en)
-    begin
-    decoder_out=7'b1111111;
-    if(en==1)
-    case (data)
-    16'h0000: decoder_out=7'b1110111; //A--None
-    16'h0000: decoder_out=7'b0000110; //1
-    16'h0000: decoder_out=7'b1011011;//2
-   16'h0000: decoder_out=7'b1001111;//3
-    16'h0000: decoder_out=7'b1100110;//4
-    16'h0000: decoder_out=7'b1101101;//5
-   16'h0000: decoder_out=7'b1111101;//6
-    16'h0000: decoder_out=7'b0000111;//7
-   16'h0000: decoder_out=7'b1111111;//8
-   16'h0000: decoder_out=7'b1101111;//9
-   16'h0000: decoder_out=7'b1111001;//E --#
-   16'h0000: decoder_out=7'b0111111;//0--
-   16'h0000: decoder_out=7'b1110001;//F--*
-    default:  decoder_out=7'b0000000;
-    endcase
-    end
+module decoder(input [7:0] conv8,
+output reg [11:0] Key
+);
+always @(*)
+begin
+case(conv8)
+8'b01000001:Key=12'b0000_0000_0001;//1
+8'b00100001:Key=12'b0000_0000_0010;//2
+8'b00010001:Key=12'b0000_0000_0100;//3
+8'b01000010:Key=12'b0000_0000_1000;//4
+8'b00100010:Key=12'b0000_0001_0000;//5
+8'b00010010:Key=12'b0000_0010_0000;//6
+8'b01000100:Key=12'b0000_0100_0000;//7
+8'b00100100:Key=12'b0000_1000_0000;//8
+8'b00010100:Key=12'b0001_0000_0000;//9
+8'b01001000:Key=12'b0010_0000_0000;//#
+8'b00101000:Key=12'b0100_0000_0000;//0
+8'b00011000:Key=12'b1000_0000_0000;//*
+default:Key=12'b0100_0000_0000;//0
+endcase
+end
 endmodule

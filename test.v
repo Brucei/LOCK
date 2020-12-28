@@ -24,10 +24,11 @@
 module test_3();
 
 reg clock,reset;
-reg [11:0] Key;
+
+reg [7:0] conv8;
 reg set_1;
 
-reg [39:0] Pressed;
+
 
 wire OPEN_1;
 wire SAVE_LIGHT_1;
@@ -36,7 +37,11 @@ wire CHANGE;
 wire SET;
 wire [15:0] data;
 wire [3:0] count_Wrong_1;
-
+//wire [6:0] led;
+wire sel;
+wire [6:0] dict;
+//wire  [3:0] dig; //????????????
+//wire  [6:0] dict ;
 parameter [39:0] None="None";
 parameter [39:0] Key_0="Key_0";
 parameter [39:0] Key_1="Key_1";
@@ -50,7 +55,7 @@ parameter [39:0] Key_8="Key_8";
 parameter [39:0] Key_9="Key_9";
 parameter [39:0] Key_xing="Key_#";
 parameter [39:0] Key_jing="Key_*";
-
+/*
 always@(*) begin
     case(Key)
     12'b0000_0000_0000: Pressed=None;
@@ -69,43 +74,51 @@ always@(*) begin
     default: Pressed=None;
     endcase
 end
-
-top_1 top(.reset(reset),.clock(clock),.Key(Key),.set_1(set_1),
-            .OPEN_1(OPEN_1),.SAVE_LIGHT_1(SAVE_LIGHT_1),.LOCK_1(LOCK_1),.CHANGE(CHANGE),.SET(SET),.data(data),.count_Wrong_1(count_Wrong_1));
+*/
+top_1 top(.reset(reset),/*.Key(Key),*/.clock(clock),.set_1(set_1),.conv8(conv8),
+            .OPEN_1(OPEN_1),.SAVE_LIGHT_1(SAVE_LIGHT_1),.LOCK_1(LOCK_1),.CHANGE(CHANGE),.SET(SET),.data(data),.count_Wrong_1(count_Wrong_1),.dict(dict),.sel(sel));
 
 
 initial clock=0;
 always #5 clock=~clock;
 
 initial begin
+
+
+conv8=8'b00101000;//0
+
+
     reset=1;
     set_1=0;
-    Key=12'b0000_0000_0000;//None
-    #100 reset=~reset;//0
-    #50 reset=~reset;//1
+   // Key=12'b0000_0000_0000;//None
+    #20 reset=~reset;//0
+    #100 reset=~reset;//1
 	
-    #100 Key = 12'b0000_0000_0010;//2
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-    #1000 Key = 0;
+    #100 conv8 = 8'b00100001;//2
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b01000010;//4
+    #1000conv8 = 8'b0;
+    #100 conv8 = 8'b00010001;//3
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b00010001;//3
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b01001000;//#
+    #1000 conv8 = 8'b0;
 	
-	#100 Key = 12'b0000_0000_0010;//2
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-	#1000 Key = 0;
-	   
+    #100 conv8 = 8'b00100001;//2
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b01000010;//4
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b00010001;//3
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b01000001;//1
+    #1000 conv8 = 8'b0;
+    #100 conv8 = 8'b01001000;//#
+    #1000 conv8 = 8'b0;
+
+
+
+	  /* 
 	#100 Key = 12'b0000_0000_0001;//1
     #100 Key = 0;
     #100 Key = 12'b0000_0000_1000;//4
@@ -185,86 +198,11 @@ initial begin
     #100 Key = 0;
     #100 Key = 12'b0010_0000_0000;//#
 	#1000 Key = 0;
-/*
-	#100 Key = 12'b0000_0000_0010;//2
-	#100 Key = 0;
-	#100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0010;//2
-	#100 Key = 0;
-	#100 Key = 12'b1000_0000_0000;//*
-    #100 Key = 0;
-
-    #100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-    #100 Key = 0;
-    #100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0010;//2
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-    #100 Key = 0;
-
- #100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-    #100 Key = 0;
-	
-    #100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-	 #100 Key = 0;
-	 
-	#100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-	#100 Key = 0;
-	
-	#100 Key = 12'b0100_0000_0000;//0
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0001;//1
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_1000;//4
-    #100 Key = 0;
-    #100 Key = 12'b0000_0000_0100;//3
-    #100 Key = 0;
-    #100 Key = 12'b0010_0000_0000;//#
-    #100 Key = 0;
-	*/
+*/
 	$stop;
 end
 
 
 
 endmodule
+

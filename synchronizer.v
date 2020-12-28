@@ -1,10 +1,12 @@
+
 module Synchronizer(
     input       [3:0]   Row,
     input               clock,
     input               reset,
     
-    output     reg        S_Row
+    output             S_Row
 );
+/*
 reg [3:0]  Row_1;
 reg [23:0] cnt;
 wire change;
@@ -16,7 +18,7 @@ Row_1<=0;
 else
 Row_1<=Row;
 
-assign change=(Row&!Row_1)|(!Row&Row_1);
+assign change=(Row&&!Row_1)||(!Row&&Row_1);
 always@(posedge clock)
 if(!reset)
 cnt<=0;
@@ -27,5 +29,6 @@ always @(posedge clock)
 if(!reset)
 S_Row<=1;
 else if(cnt==jitter-1)
-S_Row<=Row_1[0]||Row_1[1]||Row_1[2]||Row_1[3];
+*/
+ assign S_Row=Row[0]||Row[1]||Row[2]||Row[3];
 endmodule
