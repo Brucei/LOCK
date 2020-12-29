@@ -23,7 +23,7 @@ localparam
 	down		= 5'b01000,
 	filter1	 	= 5'b10000;
 
-//寄存行的值	
+//Row_store	
 always@(posedge clk or negedge rst_n)
 if(!rst_n)
 	row_r <= 0;
@@ -31,14 +31,14 @@ else
 	row_r <= row;
 
 	
-//状态机第一段		
+//FSM_Part1		
 always@(posedge clk or negedge rst_n)
 if(!rst_n)
 	c_state <= scan;
 else 
 	c_state <= n_state;
 
-//状态机第二段		
+//FSM_Part2		
 always@(*) begin
 	n_state = 5'bxxxxx;
 	case(c_state)
@@ -71,7 +71,7 @@ always@(*) begin
 	endcase
 end 
 				
-//状态机第三段
+//FSM_Part3
 always@(posedge clk or negedge rst_n) begin
 	if(!rst_n) begin
 		en_delay <= 0;
@@ -82,7 +82,7 @@ always@(posedge clk or negedge rst_n) begin
 		case(n_state)
 			scan:begin	
 				en_delay <= 0;
-				col <= {col[1:0],col[2]};		//进行col按键扫描
+				col <= {col[1:0],col[2]};		//col scan
 			end	
 			
 			judge:begin
@@ -93,7 +93,7 @@ always@(posedge clk or negedge rst_n) begin
 				en_delay <= 1;
 				if((delay == CNT_MAX-1)&&(row_r != 4'b1111)) begin
 					key_flag <= 1;
-					key_value_r <= {row_r,col};		//确定行列按键值
+					key_value_r <= {row_r,col};		//key_value decided by row&col
 				end else begin
 					key_flag <= 0;
 					key_value_r <= 0;
@@ -119,7 +119,7 @@ always@(posedge clk or negedge rst_n) begin
 	end	
 end
 
-//抖动20ms的时间计数		
+//20ms delay		
 always@(posedge clk or negedge rst_n) begin
     if(!rst_n)
         delay <= 0;
@@ -130,7 +130,7 @@ always@(posedge clk or negedge rst_n) begin
         delay <= 0;
 end
 
-//根据行和列的值确定输出按键值	
+//key value output	
 always@(posedge clk or negedge rst_n)
 if(!rst_n)
 	key_value <= 4'bxxxx;

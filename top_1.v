@@ -10,7 +10,7 @@ module top_1(
     output          CHANGE,
     output          SET,
 
-    output          sel,
+    output  [7:0]   duan,
 	output  [7:0]   wei,
     output  [2:0]   col    
 );
