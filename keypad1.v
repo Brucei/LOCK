@@ -1,92 +1,158 @@
- module keypad1(
-    input       [3:0]   Row,
-    input               S_Row,
-    input               clock,
-    input               reset,
-    
-    output reg  [3:0]   Code,
-    output reg  [2:0]   Col,
-    output reg          Valid
+module keypad1(	
+	input clk,
+	input rst_n,
+	input [3:0]row,
+
+	output reg key_flag,
+	output reg [3:0]key_value,
+	output reg [2:0]col
 );
-reg Valid_1,Valid_2;
-reg Code_OK;
-reg[4:0] state,next_state;
-parameter S_0=5'b00001;
-parameter S_1=5'b00010;
-parameter S_2=5'b00100;
-parameter S_3=5'b01000;
-parameter S_4=5'b10000;
 
-always @(posedge clock or negedge reset) begin
-    if(!reset)
-        Valid <= 0;
-    else
-        Valid <= ((next_state==S_1)||(next_state==S_2)||(next_state==S_3))&&S_Row;
+reg [3:0]   row_r;
+reg [4:0]   c_state,n_state;
+reg [6:0]   key_value_r;
+reg         en_delay;
+reg [19:0]  delay;
+
+parameter CNT_MAX = 999_999;
+
+localparam
+	scan 		= 5'b00001,
+	judge  		= 5'b00010,
+	filter0 	= 5'b00100,
+	down		= 5'b01000,
+	filter1	 	= 5'b10000;
+
+//寄存行的值	
+always@(posedge clk or negedge rst_n)
+if(!rst_n)
+	row_r <= 0;
+else 
+	row_r <= row;
+
+	
+//状态机第一段		
+always@(posedge clk or negedge rst_n)
+if(!rst_n)
+	c_state <= scan;
+else 
+	c_state <= n_state;
+
+//状态机第二段		
+always@(*) begin
+	n_state = 5'bxxxxx;
+	case(c_state)
+		scan:begin
+			n_state = judge;
+		end
+		judge:begin
+			if(row_r != 4'b1111) n_state = filter0;
+			else n_state = scan;
+		end			
+		filter0:begin
+			if(delay == CNT_MAX) begin
+				if(row_r != 4'b1111) n_state = down;
+				else n_state = scan;
+			end else
+                n_state = c_state;                    
+		end
+        down:begin
+            if(row_r == 4'b1111) n_state = filter1;
+            else n_state = c_state;
+        end        
+        filter1:begin
+            if(delay == CNT_MAX) begin
+				if(row_r != 4'b1111) n_state = down;
+				else n_state = scan;
+			end else
+				n_state = c_state;
+		end
+		default:n_state = scan;
+	endcase
+end 
+				
+//状态机第三段
+always@(posedge clk or negedge rst_n) begin
+	if(!rst_n) begin
+		en_delay <= 0;
+		col <= 4'b110;
+		key_flag <= 0;
+		key_value_r <= 0;
+	end else begin
+		case(n_state)
+			scan:begin	
+				en_delay <= 0;
+				col <= {col[1:0],col[2]};		//进行col按键扫描
+			end	
+			
+			judge:begin
+				key_flag <= 0;
+			end
+			
+			filter0:begin
+				en_delay <= 1;
+				if((delay == CNT_MAX-1)&&(row_r != 4'b1111)) begin
+					key_flag <= 1;
+					key_value_r <= {row_r,col};		//确定行列按键值
+				end else begin
+					key_flag <= 0;
+					key_value_r <= 0;
+				end 
+			end 
+			
+			down:begin
+				key_flag <= 0;
+				en_delay <= 0;
+				key_value_r <= 0;
+			end 
+				
+			filter1:begin
+				en_delay <= 1;
+			end
+
+			default:begin
+				en_delay <= 0;
+				col <= 4'b110;
+				key_flag <= 0;
+			end
+		endcase
+	end	
 end
 
-always @(posedge clock or negedge reset) begin
-    if(!reset)
-        Code=4'bxxxx;
-    //else if(Code_OK) begin
-    else begin
-        case({Row,Col})
-            7'b0001_001: Code=1;    //1
-            7'b0001_010: Code=2;    //2
-            7'b0001_100: Code=3;    //3
-            7'b0010_001: Code=4;    //4
-            7'b0010_010: Code=5;    //5
-            7'b0010_100: Code=6;    //6
-            7'b0100_001: Code=7;    //7
-            7'b0100_010: Code=8;    //8
-            7'b0100_100: Code=9;    //9
-            7'b1000_001: Code=10;   //#
-            7'b1000_010: Code=0;    //0
-            7'b1000_100: Code=11;   //*
-            default:Code=4'bxxxx;
-        endcase
-    end
+//抖动20ms的时间计数		
+always@(posedge clk or negedge rst_n) begin
+    if(!rst_n)
+        delay <= 0;
+    else if(en_delay) begin
+        if(delay == CNT_MAX) delay <= 0;
+        else delay <= delay + 1'b1;
+    end else 
+        delay <= 0;
 end
 
-always @(posedge clock,negedge reset) begin
-    if(!reset) 
-        state<=S_0;
-    else 
-        state<=next_state;
-end
+//根据行和列的值确定输出按键值	
+always@(posedge clk or negedge rst_n)
+if(!rst_n)
+	key_value <= 4'bxxxx;
+else begin
+	case(key_value_r)
+		7'b1110_110: key_value <= 4'd1;
+		7'b1110_101: key_value <= 4'd2;
+		7'b1110_011: key_value <= 4'd3;
+       
+		7'b1101_110: key_value <= 4'd4;
+		7'b1101_101: key_value <= 4'd5;
+		7'b1101_011: key_value <= 4'd6;
+       
+		7'b1011_110: key_value <= 4'd7;
+		7'b1011_101: key_value <= 4'd8;
+		7'b1011_011: key_value <= 4'd9;
+	
+		7'b0111_110: key_value <= 4'd10;
+		7'b0111_101: key_value <= 4'd0;
+		7'b0111_011: key_value <= 4'd11;
+		default:key_value <= 4'bxxxx;
+	endcase
+end 
 
-always@(negedge clock or negedge reset) begin 
-    if(!reset)
-        Col<=3'b000;
-    else begin
-        case(state)
-            S_0:begin 
-                Code_OK = 0;
-                if(S_Row) begin next_state<=S_1; Col<=3'b001; end
-                else begin next_state<=S_0; Col<=3'b111; end 
-            end
-            S_1:begin  
-                Code_OK = 0;
-                if(S_Row) begin next_state=S_4; Col<=3'b111; end
-                else begin next_state=S_2; Col<=3'b010; end
-            end
-            S_2:begin  
-                Code_OK = 0;
-                if(S_Row) begin next_state=S_4; Col<=3'b111; end
-                else begin next_state=S_3; Col<=3'b100; end
-            end
-            S_3:begin 
-                Code_OK = 0;
-                if(S_Row) begin next_state=S_4; Col<=3'b111; end
-                else begin next_state=S_0; Col<=3'b111; end 
-            end
-            S_4:begin 
-                Code_OK = 1;
-                if(!S_Row) begin next_state=S_0; Col<=3'b111; end
-                else begin next_state=S_4; Col<=3'b111; end
-            end
-            default:next_state=S_0;
-        endcase
-    end
-end
-
-endmodule
+endmodule 

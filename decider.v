@@ -34,8 +34,10 @@ module decider(
     output reg CHANGE,
     output reg [15:0] data_1,        //4key x 4bit
     output reg [3:0] count_Wrong,
-    output reg [6:0] dict,
-    output wire [7:0] sel
+    output     [3:0] Seg_1,
+    output     [3:0] Seg_2,
+    output     [3:0] Seg_3,
+    output     [3:0] Seg_4
 );
                                            
 reg [4:0] state_1;
@@ -60,8 +62,12 @@ parameter WAIT_KEY2=5'b00010;   //KEY2
 parameter WAIT_KEY3=5'b00100;   //KEY3
 parameter WAIT_KEY4=5'b01000;   //KEY4
 parameter WAIT_KEY5=5'b10000;   //KEY_OP
-assign sel=8'b11111110;
+
 assign WAIT_Done = (state_2 == WAIT_KEY5)&&(next_state_2 == WAIT_KEY1);
+assign Seg_1 = RAM[1];
+assign Seg_2 = RAM[2];
+assign Seg_3 = RAM[3];
+assign Seg_4 = RAM[4];
 
 always @(posedge clk or negedge reset_1) begin
     if(!reset_1) begin
@@ -91,9 +97,9 @@ always@(negedge clk or negedge reset_1) begin
     end
     else begin
         case(state_2)
-        WAIT_KEY1:begin RAM[1]<=Code_1;end
-        WAIT_KEY2:begin RAM[2]<=Code_1;end
-        WAIT_KEY3:begin RAM[3]<=Code_1;end
+        WAIT_KEY1:begin RAM[1]<=Code_1;RAM[2]<=4'bxxxx;RAM[3]<=4'bxxxx;RAM[4]<=4'bxxxx;end
+        WAIT_KEY2:begin RAM[2]<=Code_1;RAM[3]<=4'bxxxx;RAM[4]<=4'bxxxx;end
+        WAIT_KEY3:begin RAM[3]<=Code_1;RAM[4]<=4'bxxxx;end
         WAIT_KEY4:begin RAM[4]<=Code_1;end
         WAIT_KEY5:begin RAM[0]<=Code_1;end
         default:;
@@ -107,28 +113,7 @@ always @(posedge clk or negedge reset_1) begin
     end else
         state_1 <= next_state_1;
 end
-always @(posedge clk or negedge reset_1) begin
-    if(!reset_1)
-        dict=7'bxxxxxxx;
-    //else if(Code_OK) begin
-    else begin
-        case(Code_1)
-            7'b0001_001: dict=7'b1001111;    //1
-            7'b0001_010: dict=7'b0010010;    //2
-            7'b0001_100: dict=7'b0000110;    //3
-            7'b0010_001: dict=7'b1001100;    //4
-            7'b0010_010: dict=7'b0100100;    //5
-            7'b0010_100: dict=7'b0100000;    //6
-            7'b0100_001: dict=7'b0001111;    //7
-            7'b0100_010: dict=7'b0000000;    //8
-            7'b0100_100: dict=7'b0000100;    //9
-            7'b1000_001: dict=7'b1100010;   //#
-            7'b1000_010: dict=7'b0000001;    //0
-            7'b1000_100: dict=7'b1001000;   //*
-            default:dict=7'bxxxxxxx;
-        endcase
-    end
-end
+
 always@(*) begin
 	if(!reset_1) 
 		next_state_1=B_0;
