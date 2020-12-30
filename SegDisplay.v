@@ -57,23 +57,23 @@ always @(posedge clk_xHZ or negedge rst_n) begin
 	end else begin
 		wei <= {wei[0],wei[7:1]};
 		case(wei)
-			4'b11111110: begin
+			8'b11111110: begin
                 if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_1];
                 else duan <= 8'b11111111;
             end
-			4'b11111101:begin
+			8'b11111101:begin
                 if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_2];
                 else duan <= 8'b11111111;
             end
-			4'b11111011:begin
+			8'b11111011:begin
                 if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_3];
                 else duan <= 8'b11111111;
             end
-			4'b11110111:begin
+			8'b11110111:begin
                 if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_4];
                 else duan <= 8'b11111111;
             end
-            4'b01111111:begin
+            8'b01111111:begin
                 if(count_Wrong >= 0 && count_Wrong <= 9) duan <= array[count_Wrong];
                 else duan <= 8'b11111111;
             end

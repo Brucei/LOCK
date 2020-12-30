@@ -81,11 +81,11 @@ always@(posedge Valid_1 or negedge reset_1) begin  //change state at each up-ris
 		next_state_2 <= WAIT_KEY1;
    	else begin
 	    case(state_2)
-	        WAIT_KEY1:begin if(Valid_1) next_state_2=WAIT_KEY2;end
-	        WAIT_KEY2:begin if(Valid_1) next_state_2=WAIT_KEY3;end
-	        WAIT_KEY3:begin if(Valid_1) next_state_2=WAIT_KEY4;end
-	        WAIT_KEY4:begin if(Valid_1) next_state_2=WAIT_KEY5;end
-	        WAIT_KEY5:begin if(Valid_1) next_state_2=WAIT_KEY1;end
+	        WAIT_KEY1:begin if(Valid_1 && (Code_1 >= 0 && Code_1 <= 9)) next_state_2=WAIT_KEY2;end
+	        WAIT_KEY2:begin if(Valid_1 && (Code_1 >= 0 && Code_1 <= 9)) next_state_2=WAIT_KEY3;end
+	        WAIT_KEY3:begin if(Valid_1 && (Code_1 >= 0 && Code_1 <= 9)) next_state_2=WAIT_KEY4;end
+	        WAIT_KEY4:begin if(Valid_1 && (Code_1 >= 0 && Code_1 <= 9)) next_state_2=WAIT_KEY5;end
+	        WAIT_KEY5:begin if(Valid_1 && (Code_1 == 4'b1010 || Code_1 == 4'b1011)) next_state_2=WAIT_KEY1;end
 	        default:next_state_2=WAIT_KEY1;
 	    endcase
 	end	
@@ -93,7 +93,7 @@ end
 
 always@(negedge clk or negedge reset_1) begin
     if(!reset_1) begin
-        for(i=0;i<5;i=i+1) RAM[i] <= 0;
+        for(i=0;i<5;i=i+1) RAM[i] <= 4'bxxxx;
     end
     else begin
         case(state_2)

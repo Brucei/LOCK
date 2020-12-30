@@ -75,7 +75,7 @@ end
 always@(posedge clk or negedge rst_n) begin
 	if(!rst_n) begin
 		en_delay <= 0;
-		col <= 4'b110;
+		col <= 3'b110;
 		key_flag <= 0;
 		key_value_r <= 0;
 	end else begin
@@ -112,7 +112,7 @@ always@(posedge clk or negedge rst_n) begin
 
 			default:begin
 				en_delay <= 0;
-				col <= 4'b110;
+				col <= 3'b110;
 				key_flag <= 0;
 			end
 		endcase
