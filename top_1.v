@@ -11,10 +11,10 @@ module top_1(
     output          SET,
 
     output  [7:0]   duan,
-	output  [7:0]   wei,
+	output  [7:0]   wei_r,
     output  [2:0]   col    
 );
-
+   
 wire [3:0] Code;
 wire S_Row;
 wire Valid;
@@ -36,6 +36,6 @@ decider         M4(.reset_1(reset),.clk(clock),.Code_1(Code),.Valid_1(Valid),.se
                     .data_1(data),.count_Wrong(count_Wrong_1),.Seg_1(seg_1),.Seg_2(seg_2),.Seg_3(seg_3),.Seg_4(seg_4));
                     
 SegDisplay      M6(.clk(clock),.rst_n(reset),.Seg_1(seg_1),.Seg_2(seg_2),.Seg_3(seg_3),.Seg_4(seg_4),.count_Wrong(count_Wrong_1),
-                    .wei(wei),.duan(duan));
+                    .wei_r(wei_r),.duan(duan));
 endmodule
 

@@ -243,7 +243,7 @@ always@(posedge clk or negedge reset_1) begin
 	        CHANGE<=1'b0;
 	        RAM[0]=4'bxxxx;
         end
-
+   
         B_4: begin
 	        OPEN<=1'b0;
 	        SAVE_LIGHT<=1'b1;

@@ -15,15 +15,15 @@ reg [6:0]   key_value_r;
 reg         en_delay;
 reg [19:0]  delay;
 
-//parameter CNT_MAX = 999_999;
-parameter CNT_MAX = 999;
+parameter CNT_MAX = 999_999;
+//parameter CNT_MAX = 999;
 
 localparam
 	scan 		= 5'b00001,
 	judge  		= 5'b00010,
 	filter0 	= 5'b00100,
 	down		= 5'b01000,
-	filter1	 	= 5'b10000;
+	filter1	 	= 5'b10000;   
 
 //Row_store	
 always@(posedge clk or negedge rst_n) begin

@@ -7,10 +7,11 @@ module SegDisplay(
     input [3:0] Seg_4,
     input [3:0] count_Wrong,
     
-    output reg [7:0] wei,
+    output reg [7:0] wei_r,
     output reg [7:0] duan
 );    
 
+reg [7:0] wei;
 reg [24:0] count2;
 reg clk_xHZ;
 reg [7:0] array [0:9];
@@ -26,6 +27,13 @@ reg [7:0] array [0:9];
 //    8'b10000000,
 //    8'b10010000
 //};
+always @(posedge clk_xHZ or negedge rst_n) begin
+	if(!rst_n) begin
+		wei_r = 0;
+	end else begin 
+		wei_r = wei;
+	end
+end
 
 always @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
@@ -33,6 +41,7 @@ always @(posedge clk or negedge rst_n) begin
         count2 <= 0;
     end else begin
         if(count2==6250-1) begin 
+//         if(count2==5-1) begin 
             clk_xHZ <= ~clk_xHZ;
             count2 <= 25'b0;
         end else
@@ -58,28 +67,29 @@ always @(posedge clk_xHZ or negedge rst_n) begin
 		wei <= {wei[0],wei[7:1]};
 		case(wei)
 			8'b11111110: begin
-                if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_1];
-                else duan <= 8'b11111111;
+                if(Seg_1 >= 0 && Seg_1 <= 9) duan = array[Seg_1];
+                else duan = 8'b11111111;
             end
 			8'b11111101:begin
-                if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_2];
-                else duan <= 8'b11111111;
+                if(Seg_2 >= 0 && Seg_2 <= 9) duan = array[Seg_2];
+                else duan = 8'b11111111;
             end
 			8'b11111011:begin
-                if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_3];
-                else duan <= 8'b11111111;
+                if(Seg_3 >= 0 && Seg_3 <= 9) duan = array[Seg_3];
+                else duan = 8'b11111111;
             end
 			8'b11110111:begin
-                if(Seg_1 >= 0 && Seg_1 <= 9) duan <= array[Seg_4];
-                else duan <= 8'b11111111;
+                if(Seg_4 >= 0 && Seg_4 <= 9) duan = array[Seg_4];
+                else duan = 8'b11111111;
             end
             8'b01111111:begin
-                if(count_Wrong >= 0 && count_Wrong <= 9) duan <= array[count_Wrong];
-                else duan <= 8'b11111111;
+                if(count_Wrong >= 0 && count_Wrong <= 9) duan = array[count_Wrong];
+                else duan = 8'b11111111;
             end
-			default:duan <= 8'b11111111;
+			default:duan = 8'b11111111;
 		endcase
 	end
 end
 
 endmodule
+ 

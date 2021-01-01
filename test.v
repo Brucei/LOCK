@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module test_3();
+module test_9();
 
 reg clock,reset;
 reg set_1;
@@ -40,7 +40,7 @@ wire [2:0] col;
 
 top_1 top(  .reset(reset),.clock(clock),.set_1(set_1),.row(row),
             .OPEN_1(OPEN_1),.SAVE_LIGHT_1(SAVE_LIGHT_1),.LOCK_1(LOCK_1),
-            .CHANGE(CHANGE),.SET(SET),.wei(dict),.duan(sel),.col(col) );
+            .CHANGE(CHANGE),.SET(SET),.wei_r(wei),.duan(duan),.col(col) );
 
 initial clock = 1;
 always #10 clock = ~clock;
