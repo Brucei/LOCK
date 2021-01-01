@@ -6,7 +6,7 @@ module SegDisplay(
     input [3:0] Seg_3,
     input [3:0] Seg_4,
     input [3:0] count_Wrong,
-    
+    //test
     output reg [7:0] wei_r,
     output reg [7:0] duan
 );    
