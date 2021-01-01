@@ -1,11 +1,11 @@
 module SegDisplay(
     input clk,
     input rst_n,
-    input Seg_1,
-    input Seg_2,
-    input Seg_3,
-    input Seg_4,
-    input count_Wrong,
+    input [3:0] Seg_1,
+    input [3:0] Seg_2,
+    input [3:0] Seg_3,
+    input [3:0] Seg_4,
+    input [3:0] count_Wrong,
     
     output reg [7:0] wei,
     output reg [7:0] duan

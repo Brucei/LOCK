@@ -28,7 +28,7 @@ wire [3:0]   seg_4;
 assign S_Row = (row[0]||row[1]||row[2]||row[3]);
 
 //key scan logic     
-keypad1         M1(.clk(clock),.rst_n(reset),.row(row),.key_flag(Valid),.key_value(Code),.col(col));
+keypad1         M1(.clk(clock),.rst_n(reset),.row(row),.key_flag_r(Valid),.key_value(Code),.col(col));
 
 //main logic
 decider         M4(.reset_1(reset),.clk(clock),.Code_1(Code),.Valid_1(Valid),.set(set_1),.S_Row(S_Row),

@@ -3,18 +3,20 @@ module keypad1(
 	input rst_n,
 	input [3:0]row,
 
-	output reg key_flag,
+	output reg key_flag_r,
 	output reg [3:0]key_value,
 	output reg [2:0]col
 );
 
+reg 		key_flag;
 reg [3:0]   row_r;
 reg [4:0]   c_state,n_state;
 reg [6:0]   key_value_r;
 reg         en_delay;
 reg [19:0]  delay;
 
-parameter CNT_MAX = 999_999;
+//parameter CNT_MAX = 999_999;
+parameter CNT_MAX = 999;
 
 localparam
 	scan 		= 5'b00001,
@@ -24,19 +26,28 @@ localparam
 	filter1	 	= 5'b10000;
 
 //Row_store	
-always@(posedge clk or negedge rst_n)
-if(!rst_n)
-	row_r <= 0;
-else 
-	row_r <= row;
+always@(posedge clk or negedge rst_n) begin
+	if(!rst_n)
+		row_r <= 0;
+	else 
+		row_r <= row;
+end
 
+//key_flag delay
+always@(posedge clk or negedge rst_n) begin
+	if(!rst_n)
+		key_flag_r <= 0;
+	else 
+		key_flag_r <= key_flag;
+end
 	
 //FSM_Part1		
-always@(posedge clk or negedge rst_n)
-if(!rst_n)
-	c_state <= scan;
-else 
-	c_state <= n_state;
+always@(posedge clk or negedge rst_n) begin
+	if(!rst_n)
+		c_state <= scan;
+	else 
+		c_state <= n_state;
+end
 
 //FSM_Part2		
 always@(*) begin
@@ -131,28 +142,29 @@ always@(posedge clk or negedge rst_n) begin
 end
 
 //key value output	
-always@(posedge clk or negedge rst_n)
-if(!rst_n)
-	key_value <= 4'bxxxx;
-else begin
-	case(key_value_r)
-		7'b1110_110: key_value <= 4'd1;
-		7'b1110_101: key_value <= 4'd2;
-		7'b1110_011: key_value <= 4'd3;
-       
-		7'b1101_110: key_value <= 4'd4;
-		7'b1101_101: key_value <= 4'd5;
-		7'b1101_011: key_value <= 4'd6;
-       
-		7'b1011_110: key_value <= 4'd7;
-		7'b1011_101: key_value <= 4'd8;
-		7'b1011_011: key_value <= 4'd9;
-	
-		7'b0111_110: key_value <= 4'd10;
-		7'b0111_101: key_value <= 4'd0;
-		7'b0111_011: key_value <= 4'd11;
-		default:key_value <= 4'bxxxx;
-	endcase
-end 
+always@(posedge clk or negedge rst_n) begin
+	if(!rst_n)
+		key_value <= 4'bxxxx;
+	else begin
+		case(key_value_r)
+			7'b1110_110: key_value <= 4'd1;
+			7'b1110_101: key_value <= 4'd2;
+			7'b1110_011: key_value <= 4'd3;
+	       
+			7'b1101_110: key_value <= 4'd4;
+			7'b1101_101: key_value <= 4'd5;
+			7'b1101_011: key_value <= 4'd6;
+	       
+			7'b1011_110: key_value <= 4'd7;
+			7'b1011_101: key_value <= 4'd8;
+			7'b1011_011: key_value <= 4'd9;
+		
+			7'b0111_110: key_value <= 4'd10;
+			7'b0111_101: key_value <= 4'd0;
+			7'b0111_011: key_value <= 4'd11;
+			default:key_value <= 4'bxxxx;
+		endcase
+	end
+end	 
 
 endmodule 
