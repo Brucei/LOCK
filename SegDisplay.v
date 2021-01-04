@@ -40,8 +40,8 @@ always @(posedge clk or negedge rst_n) begin
         clk_xHZ <= 0;
         count2 <= 0;
     end else begin
-        if(count2==6250-1) begin 
-//         if(count2==5-1) begin 
+//        if(count2==6250-1) begin 
+        if(count2==5-1) begin 
             clk_xHZ <= ~clk_xHZ;
             count2 <= 25'b0;
         end else

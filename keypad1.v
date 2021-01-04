@@ -15,8 +15,8 @@ reg [6:0]   key_value_r;
 reg         en_delay;
 reg [19:0]  delay;
 
-parameter CNT_MAX = 999_999;
-//parameter CNT_MAX = 999;
+//parameter CNT_MAX = 999_999;
+parameter CNT_MAX = 999;
 
 localparam
 	scan 		= 5'b00001,
