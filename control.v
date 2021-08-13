@@ -142,6 +142,7 @@ module control(
             cnt_10s_nvld <= cnt_10s_nvld + 1;
         end
    end
+   
    assign add_cnt_10s_nvld = state_c==PASSWORD;
     assign end_cnt_10s_nvld = add_cnt_10s_nvld && cnt_10s_nvld==C_10S_NUM-1;
 
@@ -158,7 +159,6 @@ module control(
             password_correct_twice <= 0;
       end
     end
-
     
    always  @(posedge clk or negedge rst_n)begin
         if(rst_n==1'b0)begin
